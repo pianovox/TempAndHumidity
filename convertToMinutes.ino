@@ -3,6 +3,6 @@
   unsigned long minutes = seconds /60; 
   unsigned long hours = minutes/60;
 
-  return minutes;
+  return (int) minutes;
 }
 
