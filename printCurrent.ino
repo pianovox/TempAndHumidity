@@ -1,6 +1,6 @@
 void printCurrent(){
  
-  Serial.print("Current humidity = ");
+  Serial.print("            Current humidity = ");
   Serial.print(DHT.humidity);
   Serial.print("%       ");
   Serial.print("temperature = ");

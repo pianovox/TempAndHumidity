@@ -1,36 +1,42 @@
 #include <EEPROM.h>
-
 #include <elapsedMillis.h>
 #include <dht.h>
+
 #define dht_dpin A0 //no ; here. Set equal to channel sensor is on
 dht DHT;
+
+//int resetButton = digitalRead(2); //RESET BUTTON
+
+float hiTemp; 
+float loTemp;
+
+float loHumid;
+float hiHumid;
 
 elapsedMillis timeElapsed; //declare global if you don't want it reset every time loop runs
 unsigned long hiTimeStampMs;
 unsigned long loTimeStampMs;
 unsigned long hiHumidStampMs;
 unsigned long loHumidStampMs;
+unsigned long ms;
 
-float hiTemp = 0.f;
-float loTemp = 212.f;
-float loHumid = 100.f;
-float hiHumid = 0.f;
-
-//store the hours
+//store the WHEN
 int allTimeHiTempTime;
 int allTimeLoTempTime;
+
 int allTimeHiHumidTime;
 int allTimeLoHumidTime;
 
-//store the temperatures
-int allTimeHiTemp;
-int allTimeLoTemp;
-int allTimeHiHumid;
-int allTimeLoHumid;
+//store the TEMPS as these variables
+float allTimeHiTemp;
+float allTimeLoTemp;
+
+float allTimeHiHumid;
+float allTimeLoHumid;
 
 //where to save them
-int hiTempAddy = 0;
-int hiTimeAddy = 4;
+int hiTempAddy = 0;  //this works as long as numbers are under a byte (0-511)
+int hiTimeAddy = 4;  //left space just in case.  Also use EPROMAnything if numbers get big (time?)
 
 int loTempAddy = 10;
 int loTimeAddy = 14;
@@ -41,45 +47,61 @@ int hiHumidTimeAddy = 24;
 int loHumidAddy = 30;
 int loHumidTimeAddy = 34;
 
-unsigned long ms;
+//keep track of saves
+int saves = 0; //Resets when initialized
 
 void setup(){
   Serial.begin(9600);
+  pinMode(2,INPUT);
+
   delay(300);//Let system settle
-  delay(800);//Wait rest of 1000ms recommended delay before
+  delay(800);      //Wait rest of 1000ms recommended delay before
   //accessing sensor
 }
 
 void loop(){
+
+  float hiTemp = (DHT.temperature * 1.8) + 32;
+  float loTemp = (DHT.temperature * 1.8) + 32;
+
+  float loHumid = DHT.humidity;
+  float hiHumid = DHT.humidity;
+
+  //  myResetButton();
   DHT.read11(dht_dpin);
-  float newHiTempF = ((DHT.temperature * 1.8) + 32);
+
+  float newHiTempF = (DHT.temperature * 1.8) + 32;
   float newLoTempF = (DHT.temperature * 1.8) + 32;
   float newLoHumid = DHT.humidity;
   float newHiHumid = DHT.humidity;
 
   //KEEP TRACK OF HIGHS AND LOWS
-
-  if (newHiTempF > hiTemp){ //High Temp
+  if (newHiTempF >= hiTemp){ //High Temp
     hiTemp = newHiTempF; 
     hiTimeStampMs = timeElapsed;
 
     allTimeHiTempTime = convertToHours(timeElapsed-loTimeStampMs);
     allTimeHiTemp = (int)hiTemp;
 
-    EEPROM.write(hiTempAddy,allTimeHiTemp);
-    EEPROM.write(hiTimeAddy,allTimeHiTempTime);
+    if (newHiTempF > hiTemp){
+      EEPROM.write(hiTempAddy,allTimeHiTemp);
+      EEPROM.write(hiTimeAddy,allTimeHiTempTime);
+      saves++;
+    }
 
   }
-  if (newLoTempF < loTemp){
+  if (newLoTempF <= loTemp){
     loTemp = newLoTempF; 
     loTimeStampMs = timeElapsed;
 
     allTimeLoTempTime = convertToHours(timeElapsed-loTimeStampMs);
     allTimeLoTemp = (int)loTemp;
 
-    EEPROM.write(loTempAddy,allTimeLoTemp);
-    EEPROM.write(loTimeAddy,allTimeLoTempTime);
-
+    if (newLoTempF <= loTemp){
+      EEPROM.write(loTempAddy,allTimeLoTemp);
+      EEPROM.write(loTimeAddy,allTimeLoTempTime);
+      saves++;
+    }
   }
 
   if (newHiHumid > hiHumid){
@@ -92,6 +114,7 @@ void loop(){
 
     EEPROM.write(hiHumidAddy,allTimeHiHumid);
     EEPROM.write(hiHumidTimeAddy,allTimeHiHumidTime);
+    saves++;
 
   }
   if (newLoHumid < loHumid){
@@ -104,6 +127,7 @@ void loop(){
 
     EEPROM.write(loHumidAddy,allTimeLoHumid);
     EEPROM.write(loHumidTimeAddy,allTimeLoHumidTime);
+    saves++;
 
   }
 
@@ -113,11 +137,15 @@ void loop(){
   //  Serial.print("\n");  
 
   printCurrent();
-//  printHistory();
+
+  Serial.println("                                     stat   hours");
 
   //  Serial.println(EEPROM.read(hiAddy));
+  printHistory();
   printSavedHistory();
-
+  Serial.print("saves so far ");
+  Serial.print(saves);
+  Serial.print("\n\n");
 
   //  std::cout << typeid(myVar).name();
   //SERIAL TERMAINAL COMMANDS
@@ -128,7 +156,25 @@ void loop(){
 
   delay(5000); //but seems to work after 0.8 second.
 
+
+  //RESET THE TIMER?
+  //  if (convertToHours(timeElapsed) >= 168){
+  //    timeElapsed = 0;
+  //  }
+
+
 }
+
+
+
+
+
+
+
+
+
+
+
 
 
 
