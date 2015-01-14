@@ -87,7 +87,8 @@ void loop(){
 //  EEPROM_writeAnything(0, b);
 //EEPROM_writeAnything(2, b);
 //EEPROM_writeAnything(4, c);
-  
+//=========================================================================
+
   if (newHiTempF > hiTemp){ //High Temp
     hiTemp = newHiTempF; 
     hiTimeStampMs = timeElapsed;
@@ -97,6 +98,8 @@ void loop(){
     EEPROM_writeAnything(hiTimeAddy,allTimeHiTempTime);
     saves++;
   }
+  
+//==========================================================================  
   if (newLoTempF < loTemp){
     loTemp = newLoTempF; 
     loTimeStampMs = timeElapsed;
