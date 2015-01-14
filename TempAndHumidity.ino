@@ -48,6 +48,10 @@ int hiHumidTimeAddy = 24;
 int loHumidAddy = 30;
 int loHumidTimeAddy = 34;
 
+//WriteANYTHING EePROM returns these valuse
+
+int EEPROMreturn;
+
 //keep track of saves
 int saves = 0; //Resets when initialized
 
@@ -65,6 +69,7 @@ void setup(){
 
 void loop(){
 
+  
   int resetButton = digitalRead(2); //RESET BUTTON
 
   myResetButton();
@@ -98,7 +103,7 @@ void loop(){
     allTimeLoTempTime = convertToHours(timeElapsed-loTimeStampMs);
     allTimeLoTemp = (int)loTemp;
     EEPROM.write(loTempAddy,allTimeLoTemp);
-    EEPROM_writeAnything(loTimeAddy,allTimeLoTempTime);
+    EEPROM.write(loTimeAddy,allTimeLoTempTime);
     saves++;
   }
   if (newHiHumid > hiHumid){
