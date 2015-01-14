@@ -5,4 +5,5 @@
   Serial.print(convertToMinutes(ms));
   Serial.print(": "); 
   Serial.print(convertToSeconds(ms));
-  }
+  Serial.print("\n");
+}

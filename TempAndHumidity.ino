@@ -1,17 +1,18 @@
 #include <EEPROM.h>
+#include "EEPROMAnything.h"
 #include <elapsedMillis.h>
 #include <dht.h>
 
 #define dht_dpin A0 //no ; here. Set equal to channel sensor is on
 dht DHT;
 
-//int resetButton = digitalRead(2); //RESET BUTTON
 
-float hiTemp; 
-float loTemp;
 
-float loHumid;
-float hiHumid;
+float hiTemp = 0; 
+float loTemp = 100;
+
+float loHumid = 100;
+float hiHumid = 0;
 
 elapsedMillis timeElapsed; //declare global if you don't want it reset every time loop runs
 unsigned long hiTimeStampMs;
@@ -50,24 +51,25 @@ int loHumidTimeAddy = 34;
 //keep track of saves
 int saves = 0; //Resets when initialized
 
+int resetButton;
+
 void setup(){
   Serial.begin(9600);
-  pinMode(2,INPUT);
 
   delay(300);//Let system settle
   delay(800);      //Wait rest of 1000ms recommended delay before
   //accessing sensor
+  pinMode(2,INPUT);
+
 }
 
 void loop(){
 
-  float hiTemp = (DHT.temperature * 1.8) + 32;
-  float loTemp = (DHT.temperature * 1.8) + 32;
+  int resetButton = digitalRead(2); //RESET BUTTON
 
-  float loHumid = DHT.humidity;
-  float hiHumid = DHT.humidity;
+  myResetButton();
+  Serial.println(resetButton);
 
-  //  myResetButton();
   DHT.read11(dht_dpin);
 
   float newHiTempF = (DHT.temperature * 1.8) + 32;
@@ -76,72 +78,51 @@ void loop(){
   float newHiHumid = DHT.humidity;
 
   //KEEP TRACK OF HIGHS AND LOWS
-  if (newHiTempF >= hiTemp){ //High Temp
+  
+//  EEPROM_writeAnything(0, b);
+//EEPROM_writeAnything(2, b);
+//EEPROM_writeAnything(4, c);
+  
+  if (newHiTempF > hiTemp){ //High Temp
     hiTemp = newHiTempF; 
     hiTimeStampMs = timeElapsed;
-
-    allTimeHiTempTime = convertToHours(timeElapsed-loTimeStampMs);
+    allTimeHiTempTime = timeElapsed-hiTimeStampMs;
     allTimeHiTemp = (int)hiTemp;
-
-    if (newHiTempF > hiTemp){
-      EEPROM.write(hiTempAddy,allTimeHiTemp);
-      EEPROM.write(hiTimeAddy,allTimeHiTempTime);
-      saves++;
-    }
-
+    EEPROM.write(hiTempAddy,allTimeHiTemp);
+    EEPROM_writeAnything(hiTimeAddy,allTimeHiTempTime);
+    saves++;
   }
-  if (newLoTempF <= loTemp){
+  if (newLoTempF < loTemp){
     loTemp = newLoTempF; 
     loTimeStampMs = timeElapsed;
-
     allTimeLoTempTime = convertToHours(timeElapsed-loTimeStampMs);
     allTimeLoTemp = (int)loTemp;
-
-    if (newLoTempF <= loTemp){
-      EEPROM.write(loTempAddy,allTimeLoTemp);
-      EEPROM.write(loTimeAddy,allTimeLoTempTime);
-      saves++;
-    }
+    EEPROM.write(loTempAddy,allTimeLoTemp);
+    EEPROM_writeAnything(loTimeAddy,allTimeLoTempTime);
+    saves++;
   }
-
   if (newHiHumid > hiHumid){
     hiHumid = newHiHumid; 
     hiHumidStampMs = timeElapsed;
-
     allTimeHiHumidTime = convertToHours(timeElapsed-loTimeStampMs);
     allTimeHiHumid = (int)hiHumid;
-
-
     EEPROM.write(hiHumidAddy,allTimeHiHumid);
     EEPROM.write(hiHumidTimeAddy,allTimeHiHumidTime);
     saves++;
-
   }
   if (newLoHumid < loHumid){
     loHumid = newLoHumid; 
     loHumidStampMs = timeElapsed;
-
     allTimeLoHumidTime = convertToHours(timeElapsed-loTimeStampMs);
     allTimeLoHumid = (int)hiHumid;
-
-
     EEPROM.write(loHumidAddy,allTimeLoHumid);
     EEPROM.write(loHumidTimeAddy,allTimeLoHumidTime);
     saves++;
-
   }
-
-  //Print Time
-  //  Serial.print("The current timestamp is:  ");
-  //  WriteTime(timeElapsed);
-  //  Serial.print("\n");  
 
   printCurrent();
 
-  Serial.println("                                     stat   hours");
-
-  //  Serial.println(EEPROM.read(hiAddy));
-  printHistory();
+  //  printHistory();
   printSavedHistory();
   Serial.print("saves so far ");
   Serial.print(saves);
@@ -164,6 +145,7 @@ void loop(){
 
 
 }
+
 
 
 
