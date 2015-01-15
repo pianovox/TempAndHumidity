@@ -4,22 +4,22 @@ void printSavedHistory(){
   Serial.print("highest recorded temp (saved):        ");
   Serial.print(EEPROM.read(hiTempAddy)); 
   Serial.print("    "); 
-  WriteTime(EEPROM_readAnything(hiTimeAddy, EEPROMreturn));
+  WriteTime(timeElapsed-EEPROMreturnHiTempTime);
 
   Serial.print("lowest recorded temp (saved):         ");
   Serial.print(EEPROM.read(loTempAddy)); 
   Serial.print("    "); 
-  WriteTime(timeElapsed-EEPROM.read(loTimeAddy));
+  WriteTime(timeElapsed-EEPROMreturnLoTempTime);
 
   Serial.print("highest recorded humidity (saved):    ");
   Serial.print(EEPROM.read(hiHumidAddy)); 
   Serial.print("    "); 
-  Serial.println(EEPROM.read(hiHumidTimeAddy));
+  WriteTime(timeElapsed-EEPROMreturnHiHumidTime);
 
   Serial.print("lowest recorded humidity (saved):     ");
   Serial.print(EEPROM.read(loHumidAddy)); 
   Serial.print("    "); 
-  Serial.println(EEPROM.read(loHumidTimeAddy));
+  WriteTime(timeElapsed-EEPROMreturnLoHumidTime);
   Serial.print("\n");  
 }
 
@@ -48,4 +48,14 @@ void printHistory(){
   WriteTime(timeElapsed-loHumidStampMs);  
   Serial.print("\n\n\n");  
 
+}
+
+void printCurrent(){
+ 
+  Serial.print("        Current humidity = ");
+  Serial.print(DHT.humidity);
+  Serial.print("%       ");
+  Serial.print("temperature = ");
+  Serial.print((DHT.temperature * 1.8) + 32);
+  Serial.println("F  ");
 }
