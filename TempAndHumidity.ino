@@ -85,8 +85,8 @@ void loop(){
     if (resetButton == 1){
       hiTemp = 0;
       loTemp = 100;
-      hiHumid = 100;
-      loHumid = 0;
+      hiHumid = 0;
+      loHumid = 100;
       saves = 0;
       Serial.println("HEY!!!! Who turned out the lights!?!");
     }

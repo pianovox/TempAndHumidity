@@ -13,10 +13,10 @@ void saveHiLo(){
   if (newLoTempF < loTemp){
     loTemp = newLoTempF; 
     loTimeStampMs = timeElapsed;
-    allTimeLoTempTime = convertToHours(timeElapsed-loTimeStampMs);
+    allTimeLoTempTime = loTimeStampMs;
     allTimeLoTemp = (int)loTemp;
     EEPROM.write(loTempAddy,allTimeLoTemp);
-    EEPROM.write(loTimeAddy,allTimeLoTempTime);
+    EEPROM_writeAnything(loTimeAddy,allTimeLoTempTime);
     EEPROM_readAnything(loTimeAddy,EEPROMreturnLoTempTime);
 
     saves++;
@@ -24,10 +24,10 @@ void saveHiLo(){
   if (newHiHumid > hiHumid){
     hiHumid = newHiHumid; 
     hiHumidStampMs = timeElapsed;
-    allTimeHiHumidTime = convertToHours(timeElapsed-loTimeStampMs);
+    allTimeHiHumidTime = hiHumidStampMs;
     allTimeHiHumid = (int)hiHumid;
     EEPROM.write(hiHumidAddy,allTimeHiHumid);
-    EEPROM.write(hiHumidTimeAddy,allTimeHiHumidTime);
+    EEPROM_writeAnything(hiHumidTimeAddy,allTimeHiHumidTime);
     EEPROM_readAnything(hiHumidTimeAddy,EEPROMreturnHiHumidTime);
 
     saves++;
@@ -35,10 +35,10 @@ void saveHiLo(){
   if (newLoHumid < loHumid){
     loHumid = newLoHumid; 
     loHumidStampMs = timeElapsed;
-    allTimeLoHumidTime = convertToHours(timeElapsed-loTimeStampMs);
+    allTimeLoHumidTime = loHumidStampMs;
     allTimeLoHumid = (int)hiHumid;
     EEPROM.write(loHumidAddy,allTimeLoHumid);
-    EEPROM.write(loHumidTimeAddy,allTimeLoHumidTime);
+    EEPROM_writeAnything(loHumidTimeAddy,allTimeLoHumidTime);
     EEPROM_readAnything(hiHumidTimeAddy,EEPROMreturnLoHumidTime);
 
     saves++;
