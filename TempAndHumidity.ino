@@ -5,7 +5,7 @@
 #define dht_dpin A0 //no ; here. Set equal to channel sensor is on
 dht DHT;
 
-int freq = 20000;          // how often should we be polling the sensor?
+int freq = 30000;          // how often should we be polling the sensor?
 
 float hiTemp = 0; 
 float loTemp = 100;
